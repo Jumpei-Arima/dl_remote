@@ -49,7 +49,8 @@ RUN apt-get update && \
         xvfb \
         x11vnc \
         python-opengl \
-        icewm
+        icewm \
+        screen
 COPY start_vnc.sh /root/
 
 # clean cache
