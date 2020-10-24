@@ -4,12 +4,7 @@
 
 ## Docker image
 
-pull from dokcerhub
+pull from ghcr.io
 ```
-$ docker pull arijun/dl_remote:latest
-```
-
-from source code
-```
-$ docker build . -t arijun/dl_remote:latest
+$ docker pull ghcr.io/jumpei-arima/dl_remote:latest
 ```
