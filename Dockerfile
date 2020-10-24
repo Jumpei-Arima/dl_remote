@@ -1,9 +1,11 @@
 ARG nvidia_cudagl_version=10.2-devel-ubuntu18.04
+ARG python_version=3.6.7
+ARG zsh_theme=bureau
 
 FROM nvidia/cudagl:${nvidia_cudagl_version}
 ENV DEBIAN_FRONTEND=noninteractive
 
-# [1] zsh (https://github.com/robbyrussell/oh-my-zsh)
+# [1] zsh (https://github.com/ohmyzsh/ohmyzsh)
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
         wget \
@@ -11,7 +13,11 @@ RUN apt-get update -y && \
         git \
         zsh
 SHELL ["/bin/zsh", "-c"]
-RUN wget http://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+RUN wget http://github.com/ohmyzsh/ohmyzsh/raw/master/tools/install.sh -O - | zsh
+ARG zsh_theme
+ENV ZSH_THEME=${zsh_theme}
+RUN sed -i 's/robbyrussell/${ZSH_THEME}/' /root/.zshrc
+ENV DISABLE_AUTO_UPDATE=true
 
 # [2] pyenv (https://github.com/pyenv/pyenv/wiki/common-build-problems)
 RUN apt-get update -y && \
@@ -35,13 +41,13 @@ RUN apt-get update -y && \
         python-openssl \
         git
 RUN curl https://pyenv.run | zsh && \
-    echo '' >> /root/.zshrc && \
-    echo 'export PATH="/root/.pyenv/bin:$PATH"' >> /root/.zshrc && \
-    echo 'eval "$(pyenv init -)"' >> /root/.zshrc && \
-    echo 'eval "$(pyenv virtualenv-init -)"' >> /root/.zshrc
-RUN source /root/.zshrc && \
-    pyenv install 3.6.7 && \
-    pyenv global 3.6.7
+    echo 'eval "$(pyenv init -)"' >> /root/.zshrc
+ENV PATH=/root/.pyenv/shims:/root/.pyenv/bin:$PATH
+ARG python_version
+ENV PYTHON_VERSION=${python_version}
+RUN pyenv install ${PYTHON_VERSION} && \
+    pyenv global ${PYTHON_VERSION}
+RUN pip install -U pip
 
 # X window and window manager
 RUN apt-get update && \
